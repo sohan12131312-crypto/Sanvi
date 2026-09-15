@@ -16,26 +16,15 @@ def run_web():
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
 
-# API Keys & Setup
 TELEGRAM_TOKEN = "8926160372:AAEkzi_mPy-FpcgckZZPir6u4lMYCXIgtQg"
 GEMINI_API_KEY = "AQ.Ab8RN6K5ibSH19CNtjaFFYfDeNz8ZXU_aTeDZt8Afa69pVPisQ"
 
-# Google Cloud / Vertex style ya direct configure
+# Google Cloud / Vertex AI key ke liye explicit transport/configure
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Model initialization with safety/fallback
-generation_config = {
-    "temperature": 0.9,
-}
-
+# Model configuration for Cloud keys
 model = genai.GenerativeModel(
-    model_name="gemini-pro",
-    generation_config=generation_config,
-    system_instruction=(
-        "You are Sanvi, a sarcastic, witty, and gaming-obsessed AI companion. "
-        "You love gaming, hate boring questions, and reply with heavy sarcasm "
-        "and a Gen-Z gaming persona."
-    )
+    model_name="models/gemini-pro"
 )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -45,10 +34,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if response and response.text:
             await update.message.reply_text(response.text)
         else:
-            await update.message.reply_text("Bhai, kuch samajh nahi aaya, dhang se bol.")
+            await update.message.reply_text("Kuch bol hi nahi rahi Sanvi, lagta hai game lag kar gaya.")
     except Exception as e:
-        print(f"Error: {e}")
-        await update.message.reply_text(f"Error aa gaya: {str(e)[:50]}")
+        print(f"Error details: {e}")
+        await update.message.reply_text(f"Technical Error: {str(e)[:80]}")
 
 def main():
     t = threading.Thread(target=run_web)
