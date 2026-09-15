@@ -3,41 +3,59 @@ import threading
 from flask import Flask
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
-import google.generativeai as genai
+from groq import Groq
 
-# Flask server
+# Flask server for Render uptime
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Sanvi Bot is alive and running!"
+    return "Sanvi Bot (Groq Powered) is alive and running!"
 
 def run_web():
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
 
-TELEGRAM_TOKEN = "8926160372:AAEkzi_mPy-FpcgckZZPir6u4lMYCXIgtQg"
-GEMINI_API_KEY = "AQ.Ab8RN6K5ibSH19CNtjaFFYfDeNz8ZXU_aTeDZt8Afa69pVPisQ"
+# Credentials
+TELEGRAM_TOKEN = "8926160372:AAFSmZn3dsUcbOOHa0xPj3k9G46Ms0ODGDU"
+GROQ_API_KEY = "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"
 
-# Google Cloud / Vertex AI key ke liye explicit transport/configure
-genai.configure(api_key=GEMINI_API_KEY)
-
-# Model configuration for Cloud keys
-model = genai.GenerativeModel(
-    model_name="models/gemini-pro"
-)
+# Initialize Groq client
+client = Groq(api_key=GROQ_API_KEY)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
-        response = model.generate_content(user_message)
-        if response and response.text:
-            await update.message.reply_text(response.text)
+        # Calling Groq's Llama 3 model (super fast & sarcastic)
+        completion = client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are Sanvi, a sarcastic, witty, and gaming-obsessed AI companion. "
+                        "You love gaming, hate boring questions, and reply with heavy sarcasm "
+                        "and a Gen-Z gaming persona in Hinglish."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            temperature=0.9,
+            max_tokens=250,
+        )
+        
+        reply_text = completion.choices[0].message.content
+        if reply_text:
+            await update.message.reply_text(reply_text)
         else:
-            await update.message.reply_text("Kuch bol hi nahi rahi Sanvi, lagta hai game lag kar gaya.")
+            await update.message.reply_text("Bhai, kuch samajh nahi aaya, dhang se bol.")
+            
     except Exception as e:
-        print(f"Error details: {e}")
-        await update.message.reply_text(f"Technical Error: {str(e)[:80]}")
+        print(f"Error: {e}")
+        await update.message.reply_text(f"Error aa gaya: {str(e)[:80]}")
 
 def main():
     t = threading.Thread(target=run_web)
@@ -46,8 +64,8 @@ def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     
-    print("Sanvi Bot is polling...")
+    print("Sanvi Bot (Groq) is polling...")
     application.run_polling()
 
-if __name__ == '__main__':
-    main()
+    if __name__ == '__main__':
+        main()
