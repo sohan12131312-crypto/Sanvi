@@ -17,7 +17,7 @@ def run_web():
     app.run(host="0.0.0.0", port=port)
 
 # Credentials
-TELEGRAM_TOKEN = "8926160372:AAFSmZn3dsUcbOOHa0xPj3k9G46Ms0ODGDU"
+TELEGRAM_TOKEN = "8926160372:AAGV-L9MkXcwTbS0CzQPUhSBi5sjF0LX0GI"
 GROQ_API_KEY = "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"
 
 # Initialize Groq client
