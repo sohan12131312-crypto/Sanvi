@@ -27,7 +27,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
         completion = client.chat.completions.create(
-            model="llama3-70b-8192",
+            model="model="llama3-8b-8192"",
             messages=[
                 {
                     "role": "system",
