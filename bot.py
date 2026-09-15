@@ -26,9 +26,9 @@ client = Groq(api_key=GROQ_API_KEY)
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
-        # Using the most stable and current Groq model
+        # Using the current active Groq model ID
         completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {
                     "role": "system",
